@@ -3,58 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <title>📰 Fake News Detection System</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Essential for mobile scaling -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
 
     <style>
+        * {
+            box-sizing: border-box; /* Prevents padding from breaking width */
+        }
+
         body {
             margin: 0;
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
             min-height: 100vh;
             display: flex;
-            align-items: center;
+            align-items: center; /* Centers vertically on desktop */
             justify-content: center;
             color: #fff;
+            padding: 15px; /* Space around the container on mobile */
         }
 
         .container {
             background: #ffffff;
             color: #222;
             width: 100%;
-            max-width: 700px;
+            max-width: 600px;
             border-radius: 16px;
-            padding: 35px;
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            padding: 25px; /* Slightly reduced for mobile */
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
         }
 
         h1 {
             text-align: center;
-            margin-bottom: 8px;
+            margin-top: 0;
+            font-size: 1.5rem; /* Scales better than px */
+            color: #1a333d;
         }
 
         .subtitle {
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
             color: #666;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            line-height: 1.4;
         }
 
         textarea {
             width: 100%;
-            min-height: 120px;
-            padding: 15px;
-            font-size: 15px;
+            min-height: 140px;
+            padding: 12px;
+            font-size: 16px; /* 16px prevents iOS from auto-zooming on focus */
             border-radius: 10px;
-            border: 1px solid #ccc;
-            resize: vertical;
+            border: 1px solid #ddd;
+            resize: none;
             outline: none;
+            background: #fafafa;
+            transition: border 0.3s;
+        }
+
+        textarea:focus {
+            border-color: #2c5364;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-direction: column; /* Stack buttons on mobile */
+            gap: 10px;
+            margin-top: 15px;
         }
 
         button {
-            margin-top: 20px;
             width: 100%;
             padding: 14px;
             font-size: 16px;
@@ -62,132 +82,121 @@
             border: none;
             border-radius: 10px;
             cursor: pointer;
-            background: #2c5364;
-            color: #fff;
-            transition: 0.3s ease;
+            transition: transform 0.1s, background 0.3s;
         }
 
-        button:hover {
-            background: #203a43;
+        .btn-analyze {
+            background: #2c5364;
+            color: #fff;
+        }
+
+        .btn-clear {
+            background: #eee;
+            color: #555;
+        }
+
+        button:active {
+            transform: scale(0.98); /* Feedback for touch taps */
         }
 
         .result-box {
-            margin-top: 30px;
-            padding: 20px;
+            margin-top: 25px;
+            padding: 15px;
             border-radius: 12px;
-            background: #f5f7fa;
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
         }
 
         .badge {
             display: inline-block;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 10px;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 8px;
         }
 
-        .real {
-            background: #e0f7e9;
-            color: #0f7a3b;
-        }
-
-        .fake {
-            background: #fdecea;
-            color: #b42318;
-        }
-
-        .uncertain {
-            background: #fff4e5;
-            color: #b26a00;
-        }
+        .REAL { background: #dcfce7; color: #166534; }
+        .FAKE { background: #fee2e2; color: #991b1b; }
+        .UNCERTAIN { background: #fef3c7; color: #92400e; }
 
         .confidence {
-            font-size: 15px;
-            margin: 8px 0 15px;
+            font-size: 14px;
+            margin: 5px 0;
         }
 
         .news-link {
-            margin-top: 15px;
-            display: inline-block;
-            text-decoration: none;
+            margin-top: 10px;
+            display: block;
+            font-size: 14px;
             color: #2c5364;
             font-weight: 600;
-        }
-
-        .news-link:hover {
-            text-decoration: underline;
+            text-decoration: none;
         }
 
         footer {
             text-align: center;
-            margin-top: 30px;
-            font-size: 12px;
-            color: #777;
+            margin-top: 25px;
+            font-size: 11px;
+            color: #ccc;
+            opacity: 0.8;
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 600px) {
+            .container { padding: 40px; }
+            h1 { font-size: 2rem; }
+            .btn-group { flex-direction: row; } /* Side by side on big screens */
+            .btn-clear { width: 30%; }
         }
     </style>
 </head>
 <body>
-<script>
-    function clearForm() {
-        document.getElementById("newsInput").value = "";
-        const resultBox = document.querySelector(".result-box");
-        if (resultBox) {
-            resultBox.style.display = "none";
-        }
-    }
-</script>
 
 <div class="container">
-    <h1>📰 Fake News Detection System</h1>
+    <h1>📰 News Detector</h1>
     <div class="subtitle">
         Powered by BERT-based Natural Language Processing
     </div>
 
     <form method="POST" id="newsForm">
-    {% csrf_token %}
-    <textarea id="newsInput" name="news" placeholder="Type or paste a news statement here...
-Example: 'Have Cotonou schools been banned?'"></textarea>
+        {% csrf_token %}
+        <textarea id="newsInput" name="news" placeholder="Paste news headline or statement here..." required>{{ request.POST.news }}</textarea>
 
-    <button type="submit">🔍 Analyze News</button>
-    <button type="button" onclick="clearForm()" style="background:#888;margin-top:10px;">
-        ❌ Clear
-    </button>
-</form>
+        <div class="btn-group">
+            <button type="submit" class="btn-analyze">🔍 Analyze</button>
+            <button type="button" class="btn-clear" onclick="clearForm()">❌ Clear</button>
+        </div>
+    </form>
 
     {% if result %}
     <div class="result-box">
-        {% if result == "REAL" %}
-            <div class="badge real">REAL NEWS</div>
-        {% elif result == "FAKE" %}
-            <div class="badge fake">FAKE NEWS</div>
-        {% else %}
-            <div class="badge uncertain">UNCERTAIN</div>
-        {% endif %}
-
+        <div class="badge {{ result }}">{{ result }}</div>
+        
         <div class="confidence">
-            <strong>Confidence Level:</strong> {{ confidence }}%
+            <strong>Confidence:</strong> {{ confidence }}%
         </div>
-
-        <p>
-            This prediction is generated by an AI language model.
-            {% if result == "UNCERTAIN (Needs verification)" %}
-                The system recommends verifying this information from trusted sources.
-            {% endif %}
-        </p>
 
         {% if news_link %}
             <a class="news-link" href="{{ news_link }}" target="_blank">
-                🔗 Read related full news from trusted sources
+                🔗 Read full story from trusted sources
             </a>
         {% endif %}
     </div>
     {% endif %}
 
     <footer>
-        Final Year Project · Computer Science · AI & Machine Learning
+        Final Year Project · Computer Science · AI/ML
     </footer>
 </div>
+
+<script>
+    function clearForm() {
+        document.getElementById("newsInput").value = "";
+        const resultBox = document.querySelector(".result-box");
+        if (resultBox) resultBox.style.display = "none";
+    }
+</script>
 
 </body>
 </html>
