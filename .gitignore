@@ -1,0 +1,7 @@
+venv/
+model_bert/
+*.bin
+*.pt
+*.pth
+__pycache__/
+db.sqlite3
