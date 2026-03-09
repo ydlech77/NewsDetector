@@ -21,5 +21,6 @@ from detector import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home, name='home'),   # IMPORTANT
+    path('', include('pwa.urls')),
 ]
 
